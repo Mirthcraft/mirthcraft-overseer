@@ -98,15 +98,26 @@ public class PlayerManagerMixin {
             }
             // Fix link status (if user does not have role, give the role to the user, or vice versa)
             WorkThread.executeJob(() -> {
-                if (Configuration.instance().linking.linkedRoleID.equals("0")) return;
                 final UUID uuid = p.getUUID();
-                if (!LinkManager.isPlayerLinked(uuid)) return;
+                if (!LinkManager.isPlayerLinked(uuid)) {
+                    return;
+                }
+
+                final Member member = DiscordIntegration.INSTANCE.getMemberById(LinkManager.getLink(null, uuid).discordID);
+
+                if (Configuration.instance().linking.shouldNickname) {
+                    member.modifyNickname(MessageUtilsImpl.formatPlayerName(p)).queue();
+                }
+
+                if (Configuration.instance().linking.linkedRoleID.equals("0")) {
+                    return;
+                }
+
                 final Guild guild = DiscordIntegration.INSTANCE.getChannel().getGuild();
                 final Role linkedRole = guild.getRoleById(Configuration.instance().linking.linkedRoleID);
-                if (LinkManager.isPlayerLinked(uuid)) {
-                    final Member member = DiscordIntegration.INSTANCE.getMemberById(LinkManager.getLink(null, uuid).discordID);
-                    if (!member.getRoles().contains(linkedRole))
-                        guild.addRoleToMember(member, linkedRole).queue();
+
+                if (!member.getRoles().contains(linkedRole)) {
+                    guild.addRoleToMember(member, linkedRole).queue();
                 }
             });
         }
