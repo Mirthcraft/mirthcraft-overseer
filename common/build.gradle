@@ -11,6 +11,7 @@ configurations {
 }
 shadowJar {
     configurations = [project.configurations.shadow]
+    exclude 'com/google/errorprone/**'
 }
 dependencies {
     // We depend on Fabric Loader here to use the Fabric @Environment annotations,
@@ -18,7 +19,7 @@ dependencies {
     // Do NOT use other classes from Fabric Loader.
     modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
 
-     modImplementation("de.erdbeerbaerlp:dcintegration.common:$rootProject.core_version")
+    modImplementation("de.erdbeerbaerlp:dcintegration.common:$rootProject.core_version")
 }
 artifacts {
     archives tasks.shadowJar
