@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import dcshadow.net.kyori.adventure.text.Component;
 import dcshadow.net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import de.erdbeerbaerlp.dcintegration.architectury.util.MessageUtilsImpl;
+import de.erdbeerbaerlp.dcintegration.architectury.util.SerializeComponentUtils;
 import de.erdbeerbaerlp.dcintegration.common.DiscordIntegration;
 import de.erdbeerbaerlp.dcintegration.common.WorkThread;
 import de.erdbeerbaerlp.dcintegration.common.compat.FloodgateUtils;
@@ -47,7 +48,7 @@ public class PlayerManagerMixin {
         if (eventKick != null) {
             final String jsonComp = GsonComponentSerializer.gson().serialize(eventKick).replace("\\\\n", "\n");
             try {
-                final net.minecraft.network.chat.Component comp = net.minecraft.network.chat.Component.Serializer.fromJson(jsonComp, VanillaRegistries.createLookup());
+                final net.minecraft.network.chat.Component comp = SerializeComponentUtils.fromJson(jsonComp, VanillaRegistries.createLookup());
                 cir.setReturnValue(comp);
             } catch (Exception e) {
                 e.printStackTrace();

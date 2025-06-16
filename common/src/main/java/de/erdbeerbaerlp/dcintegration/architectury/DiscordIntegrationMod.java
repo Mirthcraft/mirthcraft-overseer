@@ -5,6 +5,7 @@ import dcshadow.net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import de.erdbeerbaerlp.dcintegration.architectury.api.ArchitecturyDiscordEventHandler;
 import de.erdbeerbaerlp.dcintegration.architectury.command.McCommandDiscord;
 import de.erdbeerbaerlp.dcintegration.architectury.metrics.Metrics;
+import de.erdbeerbaerlp.dcintegration.architectury.util.SerializeComponentUtils;
 import de.erdbeerbaerlp.dcintegration.architectury.util.MessageUtilsImpl;
 import de.erdbeerbaerlp.dcintegration.architectury.util.ServerInterface;
 import de.erdbeerbaerlp.dcintegration.common.DiscordIntegration;
@@ -26,7 +27,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -261,7 +261,7 @@ public final class DiscordIntegrationMod {
             if (channel == null) {
                 return message;
             }
-            final String json = net.minecraft.network.chat.Component.Serializer.toJson(message.decoratedContent(), player.level().registryAccess());
+            final String json = SerializeComponentUtils.toJson(message.decoratedContent(), player.level().registryAccess());
 
             final Component comp = GsonComponentSerializer.gson().deserialize(json);
             if (INSTANCE.callEvent((e) -> e.onMinecraftMessage(comp, player.getUUID()))) {
@@ -323,7 +323,7 @@ public final class DiscordIntegrationMod {
 
             if (!Configuration.instance().compatibility.disableParsingMentionsIngame) {
                 final String editedJson = GsonComponentSerializer.gson().serialize(MessageUtils.mentionsToNames(comp, channel.getGuild()));
-                final MutableComponent txt = net.minecraft.network.chat.Component.Serializer.fromJson(editedJson, player.level().registryAccess());
+                final MutableComponent txt = SerializeComponentUtils.fromJson(editedJson, player.level().registryAccess());
                 message = message.withUnsignedContent(txt);
             }
         }

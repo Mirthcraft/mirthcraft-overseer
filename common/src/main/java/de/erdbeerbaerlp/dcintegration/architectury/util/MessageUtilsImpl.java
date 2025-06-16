@@ -4,9 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonParseException;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import de.erdbeerbaerlp.dcintegration.architectury.util.TooltipUtils;
 import de.erdbeerbaerlp.dcintegration.common.DiscordIntegration;
 import de.erdbeerbaerlp.dcintegration.common.storage.Configuration;
 import de.erdbeerbaerlp.dcintegration.common.util.MessageUtils;
@@ -19,6 +19,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -39,7 +40,7 @@ public class MessageUtilsImpl extends MessageUtils {
         if (!Configuration.instance().forgeSpecific.sendItemInfo) return null;
         JsonObject json;
         try {
-            final JsonElement jsonElement = JsonParser.parseString(Component.Serializer.toJson(component, w.registryAccess()));
+            final JsonElement jsonElement = JsonParser.parseString(SerializeComponentUtils.toJson(component, w.registryAccess()));
 
             DiscordIntegration.LOGGER.info("JSON-Element: "+jsonElement);
             if (jsonElement.isJsonObject())
@@ -62,7 +63,8 @@ public class MessageUtilsImpl extends MessageUtils {
                                 final JsonObject item = hoverEvent.getAsJsonObject("contents").getAsJsonObject();
                                 try {
                                     final CompoundTag tag = CompoundTagArgument.compoundTag().parse(new StringReader(item.toString()));
-                                    final ItemStack is = ItemStack.parse(w.registryAccess(), tag).orElseThrow();
+                                    final ItemStack is = ItemStack.CODEC.parse(w.registryAccess().createSerializationContext(NbtOps.INSTANCE), tag)
+                                            .getOrThrow(JsonParseException::new);
 
                                     final DataComponentMap itemTag = is.getComponents();
                                     final EmbedBuilder b = new EmbedBuilder();

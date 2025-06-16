@@ -4,6 +4,7 @@ import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dcshadow.net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import de.erdbeerbaerlp.dcintegration.architectury.util.ServerInterface;
+import de.erdbeerbaerlp.dcintegration.architectury.util.SerializeComponentUtils;
 import de.erdbeerbaerlp.dcintegration.common.DiscordIntegration;
 import de.erdbeerbaerlp.dcintegration.common.minecraftCommands.MCSubCommand;
 import de.erdbeerbaerlp.dcintegration.common.minecraftCommands.McCommandRegistry;
@@ -82,7 +83,7 @@ public class CommandManagerMixin {
                                     source.sendFailure(Component.literal(Localization.instance().commands.consoleOnly));
                                 } catch (CommandSyntaxException e) {
                                     final String txt = GsonComponentSerializer.gson().serialize(mcSubCommand.execute(cmdArgs, null));
-                                    source.sendSuccess(() -> Component.Serializer.fromJson(txt, VanillaRegistries.createLookup()), false);
+                                    source.sendSuccess(() -> SerializeComponentUtils.fromJson(txt, VanillaRegistries.createLookup()), false);
                                 }
                                 break;
                             case PLAYER_ONLY:
@@ -90,13 +91,13 @@ public class CommandManagerMixin {
                                     final ServerPlayer player = source.getPlayerOrException();
                                     if (!mcSubCommand.needsOP() && ((ServerInterface) DiscordIntegration.INSTANCE.getServerInterface()).playerHasPermissions(player, MinecraftPermission.RUN_DISCORD_COMMAND, MinecraftPermission.USER)) {
                                         final String txt = GsonComponentSerializer.gson().serialize(mcSubCommand.execute(cmdArgs, player.getUUID()));
-                                        source.sendSuccess(() -> Component.Serializer.fromJson(txt, player.level().registryAccess()), false);
+                                        source.sendSuccess(() -> SerializeComponentUtils.fromJson(txt, player.level().registryAccess()), false);
                                     } else if (((ServerInterface) DiscordIntegration.INSTANCE.getServerInterface()).playerHasPermissions(player, MinecraftPermission.RUN_DISCORD_COMMAND_ADMIN)) {
                                         final String txt = GsonComponentSerializer.gson().serialize(mcSubCommand.execute(cmdArgs, player.getUUID()));
-                                        source.sendSuccess(() -> Component.Serializer.fromJson(txt, player.level().registryAccess()), false);
+                                        source.sendSuccess(() -> SerializeComponentUtils.fromJson(txt, player.level().registryAccess()), false);
                                     } else if (source.hasPermission(4)) {
                                         final String txt = GsonComponentSerializer.gson().serialize(mcSubCommand.execute(cmdArgs, player.getUUID()));
-                                        source.sendSuccess(() -> Component.Serializer.fromJson(txt, player.level().registryAccess()), false);
+                                        source.sendSuccess(() -> SerializeComponentUtils.fromJson(txt, player.level().registryAccess()), false);
                                     } else {
                                         source.sendFailure(Component.literal(Localization.instance().commands.noPermission));
                                     }
@@ -110,19 +111,19 @@ public class CommandManagerMixin {
                                     final ServerPlayer player = source.getPlayerOrException();
                                     if (!mcSubCommand.needsOP() && ((ServerInterface) DiscordIntegration.INSTANCE.getServerInterface()).playerHasPermissions(player, MinecraftPermission.RUN_DISCORD_COMMAND, MinecraftPermission.USER)) {
                                         final String txt = GsonComponentSerializer.gson().serialize(mcSubCommand.execute(cmdArgs, player.getUUID()));
-                                        source.sendSuccess(() -> Component.Serializer.fromJson(txt, VanillaRegistries.createLookup()), false);
+                                        source.sendSuccess(() -> SerializeComponentUtils.fromJson(txt, VanillaRegistries.createLookup()), false);
                                     } else if (((ServerInterface) DiscordIntegration.INSTANCE.getServerInterface()).playerHasPermissions(player, MinecraftPermission.RUN_DISCORD_COMMAND_ADMIN)) {
                                         final String txt = GsonComponentSerializer.gson().serialize(mcSubCommand.execute(cmdArgs, player.getUUID()));
-                                        source.sendSuccess(() -> Component.Serializer.fromJson(txt, VanillaRegistries.createLookup()), false);
+                                        source.sendSuccess(() -> SerializeComponentUtils.fromJson(txt, VanillaRegistries.createLookup()), false);
                                     } else if (source.hasPermission(4)) {
                                         final String txt = GsonComponentSerializer.gson().serialize(mcSubCommand.execute(cmdArgs, player.getUUID()));
-                                        source.sendSuccess(() -> Component.Serializer.fromJson(txt, VanillaRegistries.createLookup()), false);
+                                        source.sendSuccess(() -> SerializeComponentUtils.fromJson(txt, VanillaRegistries.createLookup()), false);
                                     } else {
                                         source.sendFailure(Component.literal(Localization.instance().commands.noPermission));
                                     }
                                 } catch (CommandSyntaxException e) {
                                     final String txt = GsonComponentSerializer.gson().serialize(mcSubCommand.execute(cmdArgs, null));
-                                    source.sendSuccess(() -> Component.Serializer.fromJson(txt, VanillaRegistries.createLookup()), false);
+                                    source.sendSuccess(() -> SerializeComponentUtils.fromJson(txt, VanillaRegistries.createLookup()), false);
                                 }
                                 break;
                         }

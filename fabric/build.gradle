@@ -52,13 +52,13 @@ dependencies {
 
     include "de.erdbeerbaerlp:dcintegration.common:$rootProject.core_version"
 
-    include(modImplementation('me.lucko:fabric-permissions-api:0.3.3'))
-    modImplementation include("eu.pb4:placeholder-api:2.6.2+1.21.5")
+    include(modImplementation("me.lucko:fabric-permissions-api:$rootProject.fabric_permissions_api"))
+    modImplementation include("eu.pb4:placeholder-api:$rootProject.placeholder_api")
 
     //Styled Chat
-    modCompileOnly "maven.modrinth:styled-chat:2.8.0+1.21.5"
+    modCompileOnly "maven.modrinth:styled-chat:$rootProject.styled_chat"
     // For embedding a fallback copy (which Shadow will relocate):
-    shadowBundle "maven.modrinth:styled-chat:2.8.0+1.21.5"
+    shadowBundle "maven.modrinth:styled-chat:$rootProject.styled_chat"
 }
 
 processResources {

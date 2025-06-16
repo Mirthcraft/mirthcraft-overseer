@@ -64,7 +64,7 @@ public class ServerInterface implements McServerInterface {
                 if (DiscordIntegration.INSTANCE.ignoringPlayers.contains(p.getUUID())) continue;
                 final Map.Entry<Boolean, Component> ping = ComponentUtils.parsePing(msg, p.getUUID(), p.getName().getString());
                 final String jsonComp = GsonComponentSerializer.gson().serialize(ping.getValue()).replace("\\\\n", "\n");
-                final net.minecraft.network.chat.Component comp = net.minecraft.network.chat.Component.Serializer.fromJson(jsonComp, p.level().registryAccess());
+                final net.minecraft.network.chat.Component comp = SerializeComponentUtils.fromJson(jsonComp, p.level().registryAccess());
 
                 if (LinkManager.isPlayerLinked(p.getUUID())) {
                     final PlayerLink link = LinkManager.getLink(null, p.getUUID());
@@ -81,7 +81,7 @@ public class ServerInterface implements McServerInterface {
             }
             //Send to server console too
             final String jsonComp = GsonComponentSerializer.gson().serialize(msg).replace("\\\\n", "\n");
-            final net.minecraft.network.chat.Component comp = net.minecraft.network.chat.Component.Serializer.fromJson(jsonComp, VanillaRegistries.createLookup());
+            final net.minecraft.network.chat.Component comp = SerializeComponentUtils.fromJson(jsonComp, VanillaRegistries.createLookup());
             server.sendSystemMessage(comp);
         } catch (Exception e) {
             e.printStackTrace();
@@ -131,7 +131,7 @@ public class ServerInterface implements McServerInterface {
     private void sendReactionMCMessage(ServerPlayer target, Component msgComp) {
         final String jsonComp = GsonComponentSerializer.gson().serialize(msgComp).replace("\\\\n", "\n");
         try {
-            final net.minecraft.network.chat.Component comp = net.minecraft.network.chat.Component.Serializer.fromJson(jsonComp, target.level().registryAccess());
+            final net.minecraft.network.chat.Component comp = SerializeComponentUtils.fromJson(jsonComp, target.level().registryAccess());
             target.sendSystemMessage(comp, false);
         } catch (Exception e) {
             e.printStackTrace();

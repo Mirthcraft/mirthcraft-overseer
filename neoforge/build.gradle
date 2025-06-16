@@ -55,7 +55,7 @@ dependencies {
     modCompileOnly('com.github.webbukkit:DynmapCoreAPI:2.5')
 
     //Vanishmod
-    modCompileOnly('maven.modrinth:vanishmod:DPEcQEss')
+    modCompileOnly('maven.modrinth:vanishmod:ntqQP0fn')
 }
 
 processResources {

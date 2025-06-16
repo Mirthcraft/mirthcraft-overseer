@@ -6,3 +6,7 @@
 /fabric/build/
 /neoforge/.gradle/
 /neoforge/build/
+/.idea/
+/fabric-like/build/
+/fabric-like/.gradle/
+/build/
