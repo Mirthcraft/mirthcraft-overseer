@@ -34,3 +34,17 @@ repositories {
 
     maven { url 'https://jitpack.io' }
 }
+
+processResources {
+    inputs.property "minecraft_version", rootProject.minecraft_version
+
+    filesMatching("fabric-like.dcintegration.mixins.json") {
+        expand "minecraft_version": rootProject.minecraft_version
+    }
+}
+
+loom {
+    mixin {
+        defaultRefmapName = "dcintegration-fabric-MC${project.property('minecraft_version')}-fabric-refmap.json"
+    }
+}
