@@ -55,7 +55,9 @@ dependencies {
     modCompileOnly('com.github.webbukkit:DynmapCoreAPI:2.5')
 
     //Vanishmod
-    modCompileOnly('maven.modrinth:vanishmod:ntqQP0fn')
+    modCompileOnly("maven.modrinth:vanishmod:$rootProject.vanishmod") {
+        exclude group: 'org.jetbrains', module: 'annotations'
+    }
 }
 
 processResources {
