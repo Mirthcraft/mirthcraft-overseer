@@ -42,6 +42,18 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "com.google.guava" && requested.name == "guava") {
+            useTarget("com.google.guava:guava:33.3.1-jre")
+        }
+    }
+
+    // Globally exclude errorprone no matter where it comes from
+    exclude group: 'com.google.errorprone', module: 'error_prone_annotations'
+}
+
+
 dependencies {
     neoForge "net.neoforged:neoforge:$rootProject.neoforge_version"
 
@@ -80,7 +92,7 @@ shadowJar {
         exclude(dependency('com.google.errorprone:error_prone_annotations'))
     }
 
-    relocate 'org.slf4j', 'dcshadow.org.slf4j' // keep your existing relocate
+    relocate 'org.slf4j', 'dcshadow.org.slf4j'
 }
 
 
