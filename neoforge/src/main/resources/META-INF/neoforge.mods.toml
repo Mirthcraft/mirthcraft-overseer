@@ -30,7 +30,7 @@ side = "SERVER"
 [[dependencies.dcintegration]]
 modId = "neoforge"
 mandatory = true
-versionRange = "[21.6,)"
+versionRange = "[21.6.0-beta,)"
 ordering = "NONE"
 side = "BOTH"
 
