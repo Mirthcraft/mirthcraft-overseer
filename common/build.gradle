@@ -33,6 +33,7 @@ publishing {
             maven(MavenPublication) {
                 groupId = 'de.erdbeerbaerlp'
                 artifactId = 'dcintegration.architectury'
+                version = "$rootProject.version-$rootProject.minecraft_version"
                 from components.shadow
             }
         }
