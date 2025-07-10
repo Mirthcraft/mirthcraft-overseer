@@ -124,6 +124,13 @@ public final class DiscordIntegrationMod {
             LOGGER.warn("This warning can also be suppressed in the config file");
         }
 
+        if (minecraftServer != null) {
+            Metrics.capturedServer.set(minecraftServer);
+            if (bstats == null) {
+                bstats = new Metrics(9765);
+            }
+        }
+
         bstats.addCustomChart(new Metrics.DrilldownPie("addons", () -> {
             final Map<String, Map<String, Integer>> map = new HashMap<>();
             if (Configuration.instance().bstats.sendAddonStats) {  //Only send if enabled, else send empty map
