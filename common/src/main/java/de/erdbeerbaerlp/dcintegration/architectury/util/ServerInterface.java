@@ -171,7 +171,7 @@ public class ServerInterface implements McServerInterface {
 
     @Override
     public String getNameFromUUID(UUID uuid) {
-        return server.getSessionService().fetchProfile(uuid, false).profile().getName();
+        return server.services().profileResolver().fetchById(uuid).orElseThrow().name();
     }
 
     @Override
@@ -184,7 +184,7 @@ public class ServerInterface implements McServerInterface {
     }
 
     @ExpectPlatform
-    private static boolean playerHasPermissionsX(UUID player, String... permissions) {
+    public static boolean playerHasPermissionsX(UUID player, String... permissions) {
         throw new AssertionError();
     }
 
@@ -208,7 +208,7 @@ public class ServerInterface implements McServerInterface {
         throw new AssertionError();
     }
     @ExpectPlatform
-    private static boolean playerHasPermissionsX(Player player, String... permissions) {
+    public static boolean playerHasPermissionsX(Player player, String... permissions) {
         throw new AssertionError();
     }
 

@@ -35,6 +35,10 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
+shadowJar {
+    zip64 = true
+}
+
 processResources {
     inputs.property "minecraft_version", rootProject.minecraft_version
 
