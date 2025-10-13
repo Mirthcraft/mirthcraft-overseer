@@ -12,3 +12,6 @@
 /forge/build/
 /forge/.gradle/
 /build/
+/fabric/run
+/neoforge/run
+/forge/run
