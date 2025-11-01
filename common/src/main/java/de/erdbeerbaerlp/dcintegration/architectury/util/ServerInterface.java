@@ -184,7 +184,7 @@ public class ServerInterface implements McServerInterface {
     }
 
     @ExpectPlatform
-    private static boolean playerHasPermissionsX(UUID player, String... permissions) {
+    public static boolean playerHasPermissionsX(UUID player, String... permissions) {
         throw new AssertionError();
     }
 
@@ -208,7 +208,7 @@ public class ServerInterface implements McServerInterface {
         throw new AssertionError();
     }
     @ExpectPlatform
-    private static boolean playerHasPermissionsX(Player player, String... permissions) {
+    public static boolean playerHasPermissionsX(Player player, String... permissions) {
         throw new AssertionError();
     }
 

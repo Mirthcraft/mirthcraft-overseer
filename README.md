@@ -8,4 +8,4 @@ Wiki: https://wiki.erdbeerbaerlp.de/dcintegration:root
 [![Discord Server](https://discordapp.com/api/guilds/881880836377546824/widget.png?style=banner2)](https://erd.wtf/discord)
 
 
-This Repository contains the Forge and Fabric builds
+This Repository contains the NeoForge, Forge, and Fabric builds
