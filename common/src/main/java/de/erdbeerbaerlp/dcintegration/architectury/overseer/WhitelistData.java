@@ -48,8 +48,14 @@ public class WhitelistData {
 
     public static void save() {
         CompletableFuture.runAsync(() -> {
-            try (Writer writer = Files.newBufferedWriter(FILE_PATH)) {
-                GSON.toJson(data, writer);
+            try {
+                if (FILE_PATH.getParent() != null) {
+                    Files.createDirectories(FILE_PATH.getParent());
+                }
+
+                try (Writer writer = Files.newBufferedWriter(FILE_PATH)) {
+                    GSON.toJson(data, writer);
+                }
             } catch (IOException e) {
                 DiscordIntegration.LOGGER.error("Failed to save whitelist data", e);
             }
