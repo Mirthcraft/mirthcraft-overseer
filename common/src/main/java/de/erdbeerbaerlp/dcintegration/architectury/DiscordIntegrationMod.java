@@ -34,6 +34,8 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
+import de.erdbeerbaerlp.dcintegration.architectury.overseer.WhitelistListener;
+
 import static de.erdbeerbaerlp.dcintegration.common.DiscordIntegration.INSTANCE;
 import static de.erdbeerbaerlp.dcintegration.common.DiscordIntegration.LOGGER;
 
@@ -71,6 +73,10 @@ public final class DiscordIntegrationMod {
             }
             if (DiscordIntegration.INSTANCE.getJDA() != null) {
                 Thread.sleep(2000); //Wait for it to cache the channels
+
+                // whitelist listener thingy to auto whitelist people :D
+                DiscordIntegration.INSTANCE.getJDA().addEventListener(new WhitelistListener());
+
                 CommandRegistry.registerDefaultCommands();
                 if (!Localization.instance().serverStarting.isEmpty()) {
 
