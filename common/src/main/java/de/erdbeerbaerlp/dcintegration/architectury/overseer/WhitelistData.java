@@ -6,7 +6,10 @@ import com.google.gson.reflect.TypeToken;
 import de.erdbeerbaerlp.dcintegration.common.DiscordIntegration;
 
 import java.io.*;
+import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -66,5 +69,31 @@ public class WhitelistData {
     public static void remove(String discordId) {
         data.remove(discordId);
         save();
+    }
+
+    // mojang api
+    public static CompletableFuture<MinecraftInfo> fetchFromMojang(String username) {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.mojang.com/users/profiles/minecraft/" + username))
+                .timeout(Duration.ofSeconds(5))
+                .GET()
+                .build();
+
+        return HTTP_CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(response -> {
+                    if (response.statusCode() == 200) {
+                        Map<String, String> map = GSON.fromJson(response.body(), new TypeToken<Map<String, String>>(){}.getType());
+                        return new MinecraftInfo(map.get("id"), map.get("name"));
+                    }
+                    return null;
+                })
+                .exceptionally(ex -> {
+                    DiscordIntegration.LOGGER.error("Error fetching Mojang profile for " + username, ex);
+                    return null;
+                });
+    }
+
+    static {
+        load();
     }
 }
