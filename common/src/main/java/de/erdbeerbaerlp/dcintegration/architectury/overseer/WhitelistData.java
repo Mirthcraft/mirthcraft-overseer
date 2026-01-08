@@ -14,9 +14,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class WhitelistData {
 
@@ -28,16 +30,23 @@ public class WhitelistData {
             .connectTimeout(Duration.ofSeconds(5))
             .build();
 
-    private static Map<String, MinecraftInfo> data = new ConcurrentHashMap<>();
+    private static Map<String, List<MinecraftInfo>> data = new ConcurrentHashMap<>();
 
     public record MinecraftInfo(String uuid, String name) {}
+
+    public enum LinkResult {
+        SUCCESS,
+        ALREADY_OWNED,
+        TAKEN_BY_OTHER
+    }
 
     // file operations
     public static void load() {
         if (!Files.exists(FILE_PATH)) return;
 
         try (Reader reader = Files.newBufferedReader(FILE_PATH)) {
-            Map<String, MinecraftInfo> loaded = GSON.fromJson(reader, new TypeToken<ConcurrentHashMap<String, MinecraftInfo>>(){}.getType());
+            Map<String, List<MinecraftInfo>> loaded = GSON.fromJson(reader,
+                    new TypeToken<ConcurrentHashMap<String, CopyOnWriteArrayList<MinecraftInfo>>>(){}.getType());
             if (loaded != null) {
                 data.putAll(loaded);
             }
@@ -63,18 +72,27 @@ public class WhitelistData {
     }
 
     // data access
-    public static void register(String discordId, String uuid, String name) {
-        data.put(discordId, new MinecraftInfo(uuid, name));
+    public static LinkResult register(String discordId, String uuid, String name) {
+        for (Map.Entry<String, List<MinecraftInfo>> entry : data.entrySet()) {
+            for (MinecraftInfo info : entry.getValue()) {
+                if (info.uuid().equals(uuid)) {
+                    if (entry.getKey().equals(discordId)) {
+                        return LinkResult.ALREADY_OWNED;
+                    } else {
+                        return LinkResult.TAKEN_BY_OTHER;
+                    }
+                }
+            }
+        }
+
+        data.computeIfAbsent(discordId, k -> new CopyOnWriteArrayList<>())
+                .add(new MinecraftInfo(uuid, name));
         save();
+        return LinkResult.SUCCESS;
     }
 
-    public static MinecraftInfo get(String discordId) {
+    public static List<MinecraftInfo> get(String discordId) {
         return data.get(discordId);
-    }
-
-    public static void remove(String discordId) {
-        data.remove(discordId);
-        save();
     }
 
     // mojang api

@@ -13,6 +13,7 @@ import net.minecraft.server.players.UserWhiteListEntry;
 import net.minecraft.server.players.NameAndId;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.UUID;
 
 public class WhitelistListener extends ListenerAdapter {
@@ -42,37 +43,51 @@ public class WhitelistListener extends ListenerAdapter {
 
         WhitelistData.fetchFromMojang(ign).thenAccept(info -> {
             if (info != null) {
-                WhitelistData.register(event.getAuthor().getId(), info.uuid(), info.name());
-                if (DiscordIntegrationMod.server != null) {
-                    DiscordIntegrationMod.server.execute(() -> {
-                        addToWhitelist(info.uuid(), info.name());
-                    });
+                WhitelistData.LinkResult result = WhitelistData.register(event.getAuthor().getId(), info.uuid(), info.name());
+
+                if (result == WhitelistData.LinkResult.SUCCESS) {
+                    if (DiscordIntegrationMod.server != null) {
+                        DiscordIntegrationMod.server.execute(() -> {
+                            addToWhitelist(info.uuid(), info.name());
+                        });
+                        event.getMessage().addReaction(Emoji.fromUnicode("✅")).queue();
+                    }
+
+                } else if (result == WhitelistData.LinkResult.ALREADY_OWNED) {
                     event.getMessage().addReaction(Emoji.fromUnicode("✅")).queue();
-                } else {
-                    event.getMessage().addReaction(Emoji.fromUnicode("❓")).queue();
+
+                } else if (result == WhitelistData.LinkResult.TAKEN_BY_OTHER) {
+                    event.getMessage().addReaction(Emoji.fromUnicode("⛔")).queue();
+
                 }
+            } else {
+                event.getMessage().addReaction(Emoji.fromUnicode("❓")).queue();
             }
         });
     }
 
     @Override
     public void onGuildMemberRemove(@NotNull GuildMemberRemoveEvent event) {
-        WhitelistData.MinecraftInfo info = WhitelistData.get(event.getUser().getId());
-        if (info != null && DiscordIntegrationMod.server != null) {
+        List<WhitelistData.MinecraftInfo> accounts = WhitelistData.get(event.getUser().getId());
+        if (accounts != null && !accounts.isEmpty() && DiscordIntegrationMod.server != null) {
             DiscordIntegrationMod.server.execute(() -> {
-                removeFromWhitelist(info.uuid());
-                DiscordIntegration.LOGGER.info("User {} left Discord. Removed from whitelist", info.name());
+                for (WhitelistData.MinecraftInfo info : accounts) {
+                    removeFromWhitelist(info.uuid());
+                    DiscordIntegration.LOGGER.info("User {} left Discord. Removed {} from whitelist", event.getUser().getName(), info.name());
+                }
             });
         }
     }
 
     @Override
     public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
-        WhitelistData.MinecraftInfo info = WhitelistData.get(event.getUser().getId());
-        if (info != null && DiscordIntegrationMod.server != null) {
+        List<WhitelistData.MinecraftInfo> accounts = WhitelistData.get(event.getUser().getId());
+        if (accounts != null && !accounts.isEmpty() && DiscordIntegrationMod.server != null) {
             DiscordIntegrationMod.server.execute(() -> {
-                addToWhitelist(info.uuid(), info.name());
-                DiscordIntegration.LOGGER.info("User {} joined Discord. Added to whitelist", info.name());
+                for (WhitelistData.MinecraftInfo info : accounts) {
+                    addToWhitelist(info.uuid(), info.name());
+                    DiscordIntegration.LOGGER.info("User {} joined Discord. Added {} to whitelist", event.getUser().getName(), info.name());
+                }
             });
         }
     }
