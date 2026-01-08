@@ -1,7 +1,10 @@
 package de.erdbeerbaerlp.dcintegration.architectury.overseer;
 
 import de.erdbeerbaerlp.dcintegration.common.DiscordIntegration;
+import de.erdbeerbaerlp.dcintegration.architectury.DiscordIntegrationMod;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -31,10 +34,40 @@ public class WhitelistListener extends ListenerAdapter {
             return;
         }
 
-        if (DiscordIntegration.INSTANCE != null) {
-            System.out.println("attempting to whitelist: " + ign);
-            DiscordIntegration.INSTANCE.getServerInterface().runMcCommand("whitelist add " + ign, null, event.getAuthor());
-            event.getMessage().addReaction(Emoji.fromUnicode("✅")).queue();
-        }
+        WhitelistData.fetchFromMojang(ign).thenAccept(info -> {
+            if (info != null) {
+                WhitelistData.register(event.getAuthor().getId(), info.uuid(), info.name());
+                if (DiscordIntegrationMod.server != null) {
+                    DiscordIntegrationMod.server.execute(() -> {
+                        addToWhitelist(info.uuid(), info.name());
+                    });
+                    event.getMessage().addReaction(Emoji.fromUnicode("✅")).queue();
+                } else {
+                    event.getMessage().addReaction(Emoji.fromUnicode("❓")).queue();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onGuildMemberRemove(@NotNull GuildMemberRemoveEvent event) {
+
+    }
+
+    @Override
+    public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
+
+    }
+
+    private void addToWhitelist(String rawUuid, String name) {
+
+    }
+
+    private void removeFromWhitelist(String rawUuid) {
+
+    }
+
+    private String formatUuid(String id) {
+        return id;
     }
 }
