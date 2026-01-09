@@ -18,14 +18,15 @@ import java.util.UUID;
 
 public class WhitelistListener extends ListenerAdapter {
 
-    // i know these should NOT be hardcoded but I cant be bothered to set up a config rn
-    private static final String WHITELIST_ROLE_ID = "nothing";
-    private static final String WHITELIST_CHANNEL_ID = "1458612571794964503";
+    private boolean isValid(String value) {
+        return value != null && !value.isBlank() && !value.equals("000000000000000000");
+    }
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-
-        if (!event.getChannel().getId().equals(WHITELIST_CHANNEL_ID)) return;
+        if (!OverseerConfig.ENABLED) return;
+        if (!isValid(OverseerConfig.WHITELIST_CHANNEL_ID)) return;
+        if (!event.getChannel().getId().equals(OverseerConfig.WHITELIST_CHANNEL_ID)) return;
         if (event.getAuthor().isBot()) return;
 
         String ign = event.getMessage().getContentRaw().trim();

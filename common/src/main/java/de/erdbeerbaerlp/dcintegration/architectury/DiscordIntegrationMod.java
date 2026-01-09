@@ -5,6 +5,7 @@ import dcshadow.net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import de.erdbeerbaerlp.dcintegration.architectury.api.ArchitecturyDiscordEventHandler;
 import de.erdbeerbaerlp.dcintegration.architectury.command.McCommandDiscord;
 import de.erdbeerbaerlp.dcintegration.architectury.metrics.Metrics;
+import de.erdbeerbaerlp.dcintegration.architectury.overseer.OverseerConfig;
 import de.erdbeerbaerlp.dcintegration.architectury.util.SerializeComponentUtils;
 import de.erdbeerbaerlp.dcintegration.architectury.util.MessageUtilsImpl;
 import de.erdbeerbaerlp.dcintegration.architectury.util.ServerInterface;
@@ -64,6 +65,7 @@ public final class DiscordIntegrationMod {
     public static void serverStarting(MinecraftServer minecraftServer) {
         server = minecraftServer;
         DiscordIntegration.INSTANCE = new DiscordIntegration(new ServerInterface());
+        OverseerConfig.load();
         try {
             //Wait a short time to allow JDA to get initiaized
             DiscordIntegration.LOGGER.info("Waiting for JDA to initialize to send starting message... (max 5 seconds before skipping)");
