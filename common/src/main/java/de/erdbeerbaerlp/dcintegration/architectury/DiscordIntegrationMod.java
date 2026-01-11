@@ -46,6 +46,8 @@ public final class DiscordIntegrationMod {
     public static Metrics bstats;
     public static boolean stopped = false;
 
+    public static WhitelistListener whitelistListener;
+
 
     public static final ArrayList<UUID> timeouts = new ArrayList<>();
 
@@ -77,7 +79,9 @@ public final class DiscordIntegrationMod {
                 Thread.sleep(2000); //Wait for it to cache the channels
 
                 // whitelist listener thingy to auto whitelist people :D
-                DiscordIntegration.INSTANCE.getJDA().addEventListener(new WhitelistListener());
+                WhitelistListener listener = new WhitelistListener();
+                DiscordIntegration.INSTANCE.getJDA().addEventListener(listener);
+                listener.runStartupSync();
 
                 CommandRegistry.registerDefaultCommands();
                 if (!Localization.instance().serverStarting.isEmpty()) {
@@ -102,6 +106,11 @@ public final class DiscordIntegrationMod {
         DiscordIntegration.LOGGER.info("Started");
         if (DiscordIntegration.INSTANCE != null) {
             DiscordIntegration.started = new Date().getTime();
+
+            if (whitelistListener != null) {
+                whitelistListener.runStartupSync();
+            }
+
             if (!Localization.instance().serverStarted.isBlank())
                 if (DiscordIntegration.startingMsg != null) {
                     if (Configuration.instance().embedMode.enabled && Configuration.instance().embedMode.startMessages.asEmbed) {

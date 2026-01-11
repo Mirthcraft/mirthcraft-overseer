@@ -6,7 +6,9 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.players.UserWhiteList;
 import net.minecraft.server.players.UserWhiteListEntry;
@@ -14,6 +16,7 @@ import net.minecraft.server.players.NameAndId;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class WhitelistListener extends ListenerAdapter {
@@ -90,6 +93,44 @@ public class WhitelistListener extends ListenerAdapter {
                     DiscordIntegration.LOGGER.info("User {} joined Discord. Added {} to whitelist", event.getUser().getName(), info.name());
                 }
             });
+        }
+    }
+
+    // run at start up in case someone leaves while server down
+    public void runStartupSync() {
+        if (!OverseerConfig.ENABLED) return;
+        if (!OverseerConfig.SYNC_ON_STARTUP) return;
+        if (!isValid(OverseerConfig.WHITELIST_CHANNEL_ID)) return;
+
+        var channel = DiscordIntegration.INSTANCE.getChannel(OverseerConfig.WHITELIST_CHANNEL_ID);
+        if (channel == null) return;
+        var guild = channel.getGuild();
+
+        DiscordIntegration.LOGGER.info("[The Overseer] Running Startup Sync");
+
+        Set<String> allDiscordIds = WhitelistData.getAllDiscordIds();
+
+        for (String discordId : allDiscordIds) {
+            guild.retrieveMemberById(discordId).queue(
+                    success -> {
+                        // do nothing for now but later check if changed to "former mirther"
+                    },
+                    error -> {
+                        // user not found so likely left
+                        if (error instanceof ErrorResponseException) {
+                            var e = (ErrorResponseException) error;
+                            if (e.getErrorResponse() == ErrorResponse.UNKNOWN_MEMBER) {
+                                List<WhitelistData.MinecraftInfo> accounts = WhitelistData.get(discordId);
+                                if (accounts != null && DiscordIntegrationMod.server != null) {
+                                    for (WhitelistData.MinecraftInfo info : accounts) {
+                                        removeFromWhitelist(info.uuid());
+                                        DiscordIntegration.LOGGER.info("[Sync] User {} is no longer in Discord. Removed from whitelist.", info.name());
+                                    }
+                                }
+                            }
+                        }
+                    }
+            );
         }
     }
 

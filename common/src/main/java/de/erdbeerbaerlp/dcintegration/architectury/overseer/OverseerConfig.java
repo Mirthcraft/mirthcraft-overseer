@@ -15,6 +15,7 @@ public class OverseerConfig {
     private static final Properties props = new Properties();
 
     public static boolean ENABLED = true;
+    public static boolean SYNC_ON_STARTUP = true;
     public static String WHITELIST_CHANNEL_ID = "000000000000000000";
 
     public static void load() {
@@ -28,6 +29,7 @@ public class OverseerConfig {
                 props.load(reader);
 
                 ENABLED = Boolean.parseBoolean(props.getProperty("enabled", String.valueOf(ENABLED)));
+                SYNC_ON_STARTUP = Boolean.parseBoolean(props.getProperty("sync_on_startup", String.valueOf(SYNC_ON_STARTUP)));
                 WHITELIST_CHANNEL_ID = props.getProperty("whitelist_channel_id", WHITELIST_CHANNEL_ID);
 
                 DiscordIntegration.LOGGER.info("The Overseer config loaded successfully");
@@ -44,6 +46,7 @@ public class OverseerConfig {
             }
 
             props.setProperty("enabled", String.valueOf(ENABLED));
+            props.setProperty("sync_on_startup", String.valueOf(SYNC_ON_STARTUP));
             props.setProperty("whitelist_channel_id", WHITELIST_CHANNEL_ID);
 
             try (Writer writer = Files.newBufferedWriter(CONFIG_PATH)) {

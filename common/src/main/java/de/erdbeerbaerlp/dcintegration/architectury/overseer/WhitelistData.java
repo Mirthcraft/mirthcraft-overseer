@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -93,6 +94,10 @@ public class WhitelistData {
 
     public static List<MinecraftInfo> get(String discordId) {
         return data.get(discordId);
+    }
+
+    public static Set<String> getAllDiscordIds() {
+        return data.keySet();
     }
 
     // mojang api
