@@ -9,7 +9,9 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.UserWhiteList;
 import net.minecraft.server.players.UserWhiteListEntry;
 import net.minecraft.server.players.NameAndId;
@@ -114,6 +116,8 @@ public class WhitelistListener extends ListenerAdapter {
             guild.retrieveMemberById(discordId).queue(
                     success -> {
                         // do nothing for now but later check if changed to "former mirther"
+
+                        // also add check for if someone rejoins the server and is not on the whitelist
                     },
                     error -> {
                         // user not found so likely left
@@ -162,6 +166,13 @@ public class WhitelistListener extends ListenerAdapter {
             if (whitelist.isWhiteListed(key)) {
                 whitelist.remove(key);
                 whitelist.save();
+            }
+
+            if (OverseerConfig.FORCE_KICK) {
+                ServerPlayer player = server.getPlayerList().getPlayer(uuid);
+                if (player != null) {
+                    player.connection.disconnect(Component.literal("You have been removed from the whitelist"));
+                }
             }
         } catch (Exception e) {
             DiscordIntegration.LOGGER.error("Failed to remove user from whitelist", e);
