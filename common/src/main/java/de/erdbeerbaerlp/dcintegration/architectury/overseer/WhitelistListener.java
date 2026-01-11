@@ -117,19 +117,29 @@ public class WhitelistListener extends ListenerAdapter {
                     success -> {
                         // do nothing for now but later check if changed to "former mirther"
 
-                        // also add check for if someone rejoins the server and is not on the whitelist
+                        List<WhitelistData.MinecraftInfo> accounts = WhitelistData.get(discordId);
+                        if (accounts != null && DiscordIntegrationMod.server != null) {
+                            DiscordIntegrationMod.server.execute(() -> {
+                                for (WhitelistData.MinecraftInfo info : accounts) {
+                                    if (addToWhitelist(info.uuid(), info.name())) {
+                                        DiscordIntegration.LOGGER.info("[Sync] User {} joined the Discord. Added to whitelist.", info.name());
+                                    }
+                                }
+                            });
+                        }
                     },
                     error -> {
                         // user not found so likely left
-                        if (error instanceof ErrorResponseException) {
-                            var e = (ErrorResponseException) error;
+                        if (error instanceof ErrorResponseException e) {
                             if (e.getErrorResponse() == ErrorResponse.UNKNOWN_MEMBER) {
                                 List<WhitelistData.MinecraftInfo> accounts = WhitelistData.get(discordId);
                                 if (accounts != null && DiscordIntegrationMod.server != null) {
-                                    for (WhitelistData.MinecraftInfo info : accounts) {
-                                        removeFromWhitelist(info.uuid());
-                                        DiscordIntegration.LOGGER.info("[Sync] User {} is no longer in Discord. Removed from whitelist.", info.name());
-                                    }
+                                    DiscordIntegrationMod.server.execute(() -> {
+                                        for (WhitelistData.MinecraftInfo info : accounts) {
+                                            removeFromWhitelist(info.uuid());
+                                            DiscordIntegration.LOGGER.info("[Sync] User {} is no longer in Discord. Removed from whitelist.", info.name());
+                                        }
+                                    });
                                 }
                             }
                         }
@@ -138,7 +148,7 @@ public class WhitelistListener extends ListenerAdapter {
         }
     }
 
-    private void addToWhitelist(String rawUuid, String name) {
+    private boolean addToWhitelist(String rawUuid, String name) {
         try {
             MinecraftServer server = DiscordIntegrationMod.server;
             UserWhiteList whitelist = server.getPlayerList().getWhiteList();
@@ -149,10 +159,12 @@ public class WhitelistListener extends ListenerAdapter {
             if (!whitelist.isWhiteListed(key)) {
                 whitelist.add(new UserWhiteListEntry(key));
                 whitelist.save();
+                return true;
             }
         } catch (Exception e) {
             DiscordIntegration.LOGGER.error("Failed to add user to whitelist", e);
         }
+        return false;
     }
 
     private void removeFromWhitelist(String rawUuid) {
@@ -161,6 +173,7 @@ public class WhitelistListener extends ListenerAdapter {
             UserWhiteList whitelist = server.getPlayerList().getWhiteList();
 
             UUID uuid = UUID.fromString(formatUuid(rawUuid));
+            // keep note of this because it could stop working in future update (passing in null here)
             NameAndId key = new NameAndId(uuid, null);
 
             if (whitelist.isWhiteListed(key)) {
