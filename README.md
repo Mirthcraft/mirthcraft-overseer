@@ -1,6 +1,12 @@
-A Fork of Discord Integration with custom features for MirthCraft. 
+# Mirthcraft "Overseer"
 
-**(This is just a test, nothing here has been confirmed)**
+This is a custom coded discord bot/minecraft mod for the Mirthcraft server. This mod is built on top of the "Discord Integration" mod made by ErdbeerbaerLP. The creation of this mod seeks to create modularity with the different features of Mirthcraft.
+
+---
+
+### Current Features
+
+- **Whitelist:** Set a channel for people to put their IGNs in and it will auto whitelist that user. In addition it will link that person's discord and minecraft username to automatically remove or add them to the whitelist if they leave or rejoin the discord.
 
 ---
 
