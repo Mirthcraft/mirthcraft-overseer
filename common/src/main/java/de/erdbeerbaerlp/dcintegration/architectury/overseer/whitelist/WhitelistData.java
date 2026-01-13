@@ -1,4 +1,4 @@
-package de.erdbeerbaerlp.dcintegration.architectury.overseer;
+package de.erdbeerbaerlp.dcintegration.architectury.overseer.whitelist;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

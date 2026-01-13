@@ -1,5 +1,6 @@
-package de.erdbeerbaerlp.dcintegration.architectury.overseer;
+package de.erdbeerbaerlp.dcintegration.architectury.overseer.whitelist;
 
+import de.erdbeerbaerlp.dcintegration.architectury.overseer.OverseerConfig;
 import de.erdbeerbaerlp.dcintegration.common.DiscordIntegration;
 import de.erdbeerbaerlp.dcintegration.architectury.DiscordIntegrationMod;
 import net.dv8tion.jda.api.entities.emoji.Emoji;

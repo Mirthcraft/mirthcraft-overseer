@@ -35,7 +35,7 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
-import de.erdbeerbaerlp.dcintegration.architectury.overseer.WhitelistListener;
+import de.erdbeerbaerlp.dcintegration.architectury.overseer.whitelist.WhitelistListener;
 
 import static de.erdbeerbaerlp.dcintegration.common.DiscordIntegration.INSTANCE;
 import static de.erdbeerbaerlp.dcintegration.common.DiscordIntegration.LOGGER;

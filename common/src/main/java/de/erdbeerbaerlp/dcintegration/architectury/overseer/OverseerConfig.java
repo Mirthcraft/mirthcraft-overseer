@@ -22,6 +22,16 @@ public class OverseerConfig {
     public static String WHITELIST_CHANNEL_ID = "000000000000000000";
     public static String FORMER_MIRTHER_ROLE_ID = "000000000000000000";
 
+    // Friend Friday Config
+    public static boolean FF_ENABLED = true;
+    public static int FF_START_HOUR_UTC = 6;
+    public static int FF_DURATION_HOURS = 24;
+    public static int FF_ANNOUNCE_DELAY_HOURS = 8;
+    public static String FF_ANNOUNCE_CHANNEL_ID = "000000000000000000";
+    public static String FF_PING_ROLE_ID = "000000000000000000";
+    public static String FF_ROLE_ID = "000000000000000000";
+    public static String FF_KICK_DM = "Sadly Friend Friday is over! Thank you for joining us and we hope to see you again. If you wish to stay, keep a look out for applications to open!";
+
     public static void load() {
         try {
             if (!Files.exists(CONFIG_PATH)) {
@@ -37,6 +47,16 @@ public class OverseerConfig {
                 FORCE_KICK = Boolean.parseBoolean(props.getProperty("force_kick", String.valueOf(FORCE_KICK)));
                 WHITELIST_CHANNEL_ID = props.getProperty("whitelist_channel_id", WHITELIST_CHANNEL_ID);
                 FORMER_MIRTHER_ROLE_ID = props.getProperty("former_mirther_role_id", FORMER_MIRTHER_ROLE_ID);
+
+                // load Friend Friday
+                FF_ENABLED = Boolean.parseBoolean(props.getProperty("ff_enabled", String.valueOf(FF_ENABLED)));
+                FF_START_HOUR_UTC = Integer.parseInt(props.getProperty("ff_start_hour_utc", String.valueOf(FF_START_HOUR_UTC)));
+                FF_DURATION_HOURS = Integer.parseInt(props.getProperty("ff_duration_hours", String.valueOf(FF_DURATION_HOURS)));
+                FF_ANNOUNCE_DELAY_HOURS = Integer.parseInt(props.getProperty("ff_announce_delay_hours", String.valueOf(FF_ANNOUNCE_DELAY_HOURS)));
+                FF_ANNOUNCE_CHANNEL_ID = props.getProperty("ff_announce_channel_id", FF_ANNOUNCE_CHANNEL_ID);
+                FF_PING_ROLE_ID = props.getProperty("ff_ping_role_id", FF_PING_ROLE_ID);
+                FF_ROLE_ID = props.getProperty("ff_role_id", FF_ROLE_ID);
+                FF_KICK_DM = props.getProperty("ff_kick_dm", FF_KICK_DM);
 
                 DiscordIntegration.LOGGER.info("The Overseer config loaded successfully");
             }
@@ -56,6 +76,16 @@ public class OverseerConfig {
             props.setProperty("force_kick", String.valueOf(FORCE_KICK));
             props.setProperty("whitelist_channel_id", WHITELIST_CHANNEL_ID);
             props.setProperty("former_mirther_role_id", FORMER_MIRTHER_ROLE_ID);
+
+            // friend friday
+            props.setProperty("ff_enabled", String.valueOf(FF_ENABLED));
+            props.setProperty("ff_start_hour_utc", String.valueOf(FF_START_HOUR_UTC));
+            props.setProperty("ff_duration_hours", String.valueOf(FF_DURATION_HOURS));
+            props.setProperty("ff_announce_delay_hours", String.valueOf(FF_ANNOUNCE_DELAY_HOURS));
+            props.setProperty("ff_announce_channel_id", FF_ANNOUNCE_CHANNEL_ID);
+            props.setProperty("ff_ping_role_id", FF_PING_ROLE_ID);
+            props.setProperty("ff_role_id", FF_ROLE_ID);
+            props.setProperty("ff_kick_dm", FF_KICK_DM);
 
             try (Writer writer = Files.newBufferedWriter(CONFIG_PATH)) {
                 props.store(writer, "The Overseer Configuration File");
