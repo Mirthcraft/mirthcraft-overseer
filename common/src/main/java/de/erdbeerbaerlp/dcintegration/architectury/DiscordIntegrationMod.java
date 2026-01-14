@@ -6,6 +6,8 @@ import de.erdbeerbaerlp.dcintegration.architectury.api.ArchitecturyDiscordEventH
 import de.erdbeerbaerlp.dcintegration.architectury.command.McCommandDiscord;
 import de.erdbeerbaerlp.dcintegration.architectury.metrics.Metrics;
 import de.erdbeerbaerlp.dcintegration.architectury.overseer.OverseerConfig;
+import de.erdbeerbaerlp.dcintegration.architectury.overseer.friendfriday.FriendFidayManager;
+import de.erdbeerbaerlp.dcintegration.architectury.overseer.friendfriday.FriendFridayListener;
 import de.erdbeerbaerlp.dcintegration.architectury.util.SerializeComponentUtils;
 import de.erdbeerbaerlp.dcintegration.architectury.util.MessageUtilsImpl;
 import de.erdbeerbaerlp.dcintegration.architectury.util.ServerInterface;
@@ -18,10 +20,16 @@ import de.erdbeerbaerlp.dcintegration.common.storage.Localization;
 import de.erdbeerbaerlp.dcintegration.common.storage.linking.LinkManager;
 import de.erdbeerbaerlp.dcintegration.common.util.*;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.minecraft.network.chat.MutableComponent;
@@ -36,6 +44,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
 import de.erdbeerbaerlp.dcintegration.architectury.overseer.whitelist.WhitelistListener;
+import org.jetbrains.annotations.NotNull;
 
 import static de.erdbeerbaerlp.dcintegration.common.DiscordIntegration.INSTANCE;
 import static de.erdbeerbaerlp.dcintegration.common.DiscordIntegration.LOGGER;
@@ -47,6 +56,7 @@ public final class DiscordIntegrationMod {
     public static boolean stopped = false;
 
     public static WhitelistListener whitelistListener;
+    public static FriendFridayListener FriendFridayListener;
 
 
     public static final ArrayList<UUID> timeouts = new ArrayList<>();
@@ -107,9 +117,31 @@ public final class DiscordIntegrationMod {
         if (DiscordIntegration.INSTANCE != null) {
             DiscordIntegration.started = new Date().getTime();
 
+            // start up sync
             if (whitelistListener != null) {
                 whitelistListener.runStartupSync();
             }
+
+            // friend friday
+            //FriendFidayManager.init();
+            FriendFridayListener = new FriendFridayListener();
+            DiscordIntegration.INSTANCE.getJDA().addEventListener(FriendFridayListener);
+
+            // per guild register on a delay because otherwise it gets deleted
+            java.util.concurrent.Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+                Guild guild = DiscordIntegration.INSTANCE.getJDA().getGuildById(OverseerConfig.GUILD_ID);
+                if (guild != null) {
+                    guild.upsertCommand("friendfriday", "Generate a Friend Friday invite link").queue(
+                            s -> DiscordIntegration.LOGGER.info("[The Overseer] Registering Slash Command /friendfriday"),
+                            e -> DiscordIntegration.LOGGER.error("[The Overseer] Failed to register Slash Command /friendfriday", e)
+                    );
+                }
+            }, 2, java.util.concurrent.TimeUnit.SECONDS);
+
+            // global command register
+//            DiscordIntegration.INSTANCE.getJDA()
+//                    .upsertCommand("friendfriday", "Generate Friend Friday invite")
+//                    .queue();
 
             if (!Localization.instance().serverStarted.isBlank())
                 if (DiscordIntegration.startingMsg != null) {
