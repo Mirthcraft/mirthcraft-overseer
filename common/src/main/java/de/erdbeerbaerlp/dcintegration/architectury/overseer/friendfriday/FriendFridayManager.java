@@ -12,12 +12,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class FriendFidayManager {
+public class FriendFridayManager {
     private static boolean isActive = false;
     private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     public static void init() {
-        scheduler.scheduleAtFixedRate(FriendFidayManager::checkTime, 0 ,1, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(FriendFridayManager::checkTime, 0 ,1, TimeUnit.MINUTES);
     }
 
     public static boolean isActive() {

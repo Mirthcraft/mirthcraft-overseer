@@ -17,7 +17,7 @@ public class FriendFridayListener extends ListenerAdapter {
         // check for /friendfriday
         if (event.getName().equals("friendfriday")) {
             // if friend friday not active, dont make invite
-            if (!FriendFidayManager.isActive()) {
+            if (!FriendFridayManager.isActive()) {
                 event.replyEmbeds(new EmbedBuilder()
                         .setColor(Color.RED)
                         .setDescription("It's currently not Friday, please wait till Friday to invite your friend.")
