@@ -2,7 +2,7 @@ package de.erdbeerbaerlp.dcintegration.architectury.overseer.friendfriday;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
+import com.google.gson.JsonObject;
 import de.erdbeerbaerlp.dcintegration.common.DiscordIntegration;
 
 import java.io.IOException;
@@ -11,25 +11,25 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class FriendFridayData {
     private static final Path FILE_PATH = Paths.get("TheOverseer-Data/friend_friday_invites.json");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    private static final Set<String> activeCodes = ConcurrentHashMap.newKeySet();
+    public static long endTime = -1;
+    public static String currentInvite = "";
 
     public static void load() {
         if (!Files.exists(FILE_PATH)) return;
         try (Reader reader = Files.newBufferedReader(FILE_PATH)) {
-            Set<String> loaded = GSON.fromJson(reader, new TypeToken<Set<String>>(){}.getType());
-            if (loaded != null) {
-                activeCodes.addAll(loaded);
+            JsonObject json = GSON.fromJson(reader, JsonObject.class);
+            if (json != null) {
+                if (json.has("endTime")) endTime = json.get("endTime").getAsLong();
+                if (json.has("currentInvite")) currentInvite = json.get("currentInvite").getAsString();
             }
         } catch (IOException e) {
-            DiscordIntegration.LOGGER.error("Failed to load Friend Friday invites", e);
+            DiscordIntegration.LOGGER.error("Failed to load Friend Friday data", e);
         }
     }
 
@@ -39,31 +39,27 @@ public class FriendFridayData {
                 if (FILE_PATH.getParent() != null) {
                     Files.createDirectories(FILE_PATH.getParent());
                 }
+
+                JsonObject json = new JsonObject();
+                json.addProperty("endTime", endTime);
+                json.addProperty("currentInvite", currentInvite);
+
                 try (Writer writer = Files.newBufferedWriter(FILE_PATH)) {
-                    GSON.toJson(activeCodes, writer);
+                    GSON.toJson(json, writer);
                 }
             } catch (IOException e) {
-                DiscordIntegration.LOGGER.error("Failed to save Friend Friday invites", e);
+                DiscordIntegration.LOGGER.error("Failed to save Friend Friday data", e);
             }
         });
     }
 
-    public static void addCodes(String code) {
-        activeCodes.add(code);
-        save();
-    }
-
-    public static void removeCodes(String code) {
-        activeCodes.remove(code);
-        save();
-    }
-
-    public static boolean isFriendFridayCode(String code){
-        return activeCodes.contains(code);
+    public static boolean isActive() {
+        return endTime > System.currentTimeMillis();
     }
 
     public static void clear() {
-        activeCodes.clear();
+        endTime = -1;
+        currentInvite = "";
         save();
     }
 }

@@ -16,25 +16,16 @@ public class FriendFridayListener extends ListenerAdapter {
         if (!OverseerConfig.FF_ENABLED) return;
         // check for /friendfriday
         if (event.getName().equals("friendfriday")) {
-            // if friend friday not active, dont make invite
-            if (!FriendFridayManager.isActive()) {
-                event.replyEmbeds(new EmbedBuilder()
-                        .setColor(Color.RED)
-                        .setDescription("It's currently not Friday, please wait till Friday to invite your friend.")
-                        .build())
-                        .setEphemeral(true)
-                        .queue();
-                return;
-            }
 
-            event.deferReply(true).queue();
+            // will have to send message here
 
-            int duractionSeconds = OverseerConfig.FF_DURATION_HOURS * 3600;
+            FriendFridayManager.startEvent("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+            // temp link, will parse from command later
         }
     }
 
     @Override
     public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
-
+        // check if user joined from provided link then give them friend friday role if they dont already have it from the invite (for whatever reason)
     }
 }

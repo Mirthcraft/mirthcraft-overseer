@@ -28,6 +28,8 @@ public class OverseerConfig {
     public static int FF_START_HOUR_UTC = 6;
     public static int FF_DURATION_HOURS = 24;
     public static int FF_ANNOUNCE_DELAY_HOURS = 8;
+    public static int FF_END_HOUR_UTC = 7;
+    public static String FF_END_DAY = "SATURDAY";
     public static String FF_ANNOUNCE_CHANNEL_ID = "000000000000000000";
     public static String FF_PING_ROLE_ID = "000000000000000000";
     public static String FF_ROLE_ID = "000000000000000000";
@@ -55,6 +57,8 @@ public class OverseerConfig {
                 FF_START_HOUR_UTC = Integer.parseInt(props.getProperty("ff_start_hour_utc", String.valueOf(FF_START_HOUR_UTC)));
                 FF_DURATION_HOURS = Integer.parseInt(props.getProperty("ff_duration_hours", String.valueOf(FF_DURATION_HOURS)));
                 FF_ANNOUNCE_DELAY_HOURS = Integer.parseInt(props.getProperty("ff_announce_delay_hours", String.valueOf(FF_ANNOUNCE_DELAY_HOURS)));
+                FF_END_HOUR_UTC = Integer.parseInt(props.getProperty("ff_end_hour_utc", String.valueOf(FF_END_HOUR_UTC)));
+                FF_END_DAY = props.getProperty("ff_end_day", FF_END_DAY);
                 FF_ANNOUNCE_CHANNEL_ID = props.getProperty("ff_announce_channel_id", FF_ANNOUNCE_CHANNEL_ID);
                 FF_PING_ROLE_ID = props.getProperty("ff_ping_role_id", FF_PING_ROLE_ID);
                 FF_ROLE_ID = props.getProperty("ff_role_id", FF_ROLE_ID);
@@ -85,6 +89,8 @@ public class OverseerConfig {
             props.setProperty("ff_start_hour_utc", String.valueOf(FF_START_HOUR_UTC));
             props.setProperty("ff_duration_hours", String.valueOf(FF_DURATION_HOURS));
             props.setProperty("ff_announce_delay_hours", String.valueOf(FF_ANNOUNCE_DELAY_HOURS));
+            props.setProperty("ff_end_hour_utc", String.valueOf(FF_END_HOUR_UTC));
+            props.setProperty("ff_end_day", FF_END_DAY);
             props.setProperty("ff_announce_channel_id", FF_ANNOUNCE_CHANNEL_ID);
             props.setProperty("ff_ping_role_id", FF_PING_ROLE_ID);
             props.setProperty("ff_role_id", FF_ROLE_ID);
