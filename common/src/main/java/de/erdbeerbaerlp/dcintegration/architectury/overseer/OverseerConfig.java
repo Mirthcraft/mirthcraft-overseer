@@ -21,13 +21,11 @@ public class OverseerConfig {
     public static boolean FORCE_KICK = true;
     public static String GUILD_ID = "000000000000000000";
     public static String WHITELIST_CHANNEL_ID = "000000000000000000";
+    public static String ACTIVE_MIRTHER_ROLE_ID = "000000000000000000";
     public static String FORMER_MIRTHER_ROLE_ID = "000000000000000000";
 
     // Friend Friday Config
     public static boolean FF_ENABLED = true;
-    public static int FF_START_HOUR_UTC = 6;
-    public static int FF_DURATION_HOURS = 24;
-    public static int FF_ANNOUNCE_DELAY_HOURS = 8;
     public static int FF_END_HOUR_UTC = 7;
     public static String FF_END_DAY = "SATURDAY";
     public static String FF_ANNOUNCE_CHANNEL_ID = "000000000000000000";
@@ -50,13 +48,11 @@ public class OverseerConfig {
                 FORCE_KICK = Boolean.parseBoolean(props.getProperty("force_kick", String.valueOf(FORCE_KICK)));
                 GUILD_ID = props.getProperty("guild_id", GUILD_ID);
                 WHITELIST_CHANNEL_ID = props.getProperty("whitelist_channel_id", WHITELIST_CHANNEL_ID);
+                ACTIVE_MIRTHER_ROLE_ID = props.getProperty("active_mirther_role_id", ACTIVE_MIRTHER_ROLE_ID);
                 FORMER_MIRTHER_ROLE_ID = props.getProperty("former_mirther_role_id", FORMER_MIRTHER_ROLE_ID);
 
                 // load Friend Friday
                 FF_ENABLED = Boolean.parseBoolean(props.getProperty("ff_enabled", String.valueOf(FF_ENABLED)));
-                FF_START_HOUR_UTC = Integer.parseInt(props.getProperty("ff_start_hour_utc", String.valueOf(FF_START_HOUR_UTC)));
-                FF_DURATION_HOURS = Integer.parseInt(props.getProperty("ff_duration_hours", String.valueOf(FF_DURATION_HOURS)));
-                FF_ANNOUNCE_DELAY_HOURS = Integer.parseInt(props.getProperty("ff_announce_delay_hours", String.valueOf(FF_ANNOUNCE_DELAY_HOURS)));
                 FF_END_HOUR_UTC = Integer.parseInt(props.getProperty("ff_end_hour_utc", String.valueOf(FF_END_HOUR_UTC)));
                 FF_END_DAY = props.getProperty("ff_end_day", FF_END_DAY);
                 FF_ANNOUNCE_CHANNEL_ID = props.getProperty("ff_announce_channel_id", FF_ANNOUNCE_CHANNEL_ID);
@@ -82,13 +78,11 @@ public class OverseerConfig {
             props.setProperty("force_kick", String.valueOf(FORCE_KICK));
             props.setProperty("guild_id", GUILD_ID);
             props.setProperty("whitelist_channel_id", WHITELIST_CHANNEL_ID);
+            props.setProperty("active_mirther_role_id", ACTIVE_MIRTHER_ROLE_ID);
             props.setProperty("former_mirther_role_id", FORMER_MIRTHER_ROLE_ID);
 
             // friend friday
             props.setProperty("ff_enabled", String.valueOf(FF_ENABLED));
-            props.setProperty("ff_start_hour_utc", String.valueOf(FF_START_HOUR_UTC));
-            props.setProperty("ff_duration_hours", String.valueOf(FF_DURATION_HOURS));
-            props.setProperty("ff_announce_delay_hours", String.valueOf(FF_ANNOUNCE_DELAY_HOURS));
             props.setProperty("ff_end_hour_utc", String.valueOf(FF_END_HOUR_UTC));
             props.setProperty("ff_end_day", FF_END_DAY);
             props.setProperty("ff_announce_channel_id", FF_ANNOUNCE_CHANNEL_ID);
