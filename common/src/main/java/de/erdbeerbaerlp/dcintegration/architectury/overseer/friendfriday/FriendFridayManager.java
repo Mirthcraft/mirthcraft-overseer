@@ -74,7 +74,10 @@ public class FriendFridayManager {
     }
 
     //stop friend friday
-    private static void endEvent() {
+    public static void endEvent() {
+
+        // delete invite from the server so that no one else can join from it
+
         isActive = false;
         DiscordIntegration.LOGGER.info("Friend Friday is over!");
 

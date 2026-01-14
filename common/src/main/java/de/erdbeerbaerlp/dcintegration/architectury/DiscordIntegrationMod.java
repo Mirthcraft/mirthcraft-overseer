@@ -7,6 +7,7 @@ import de.erdbeerbaerlp.dcintegration.architectury.command.McCommandDiscord;
 import de.erdbeerbaerlp.dcintegration.architectury.metrics.Metrics;
 import de.erdbeerbaerlp.dcintegration.architectury.overseer.OverseerConfig;
 import de.erdbeerbaerlp.dcintegration.architectury.overseer.friendfriday.FriendFridayListener;
+import de.erdbeerbaerlp.dcintegration.architectury.overseer.friendfriday.FriendFridayManager;
 import de.erdbeerbaerlp.dcintegration.architectury.util.SerializeComponentUtils;
 import de.erdbeerbaerlp.dcintegration.architectury.util.MessageUtilsImpl;
 import de.erdbeerbaerlp.dcintegration.architectury.util.ServerInterface;
@@ -24,6 +25,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.minecraft.network.chat.MutableComponent;
@@ -116,7 +118,7 @@ public final class DiscordIntegrationMod {
             }
 
             // friend friday
-            //FriendFidayManager.init();
+            FriendFridayManager.init();
             FriendFridayListener = new FriendFridayListener();
             DiscordIntegration.INSTANCE.getJDA().addEventListener(FriendFridayListener);
 
@@ -124,10 +126,18 @@ public final class DiscordIntegrationMod {
             java.util.concurrent.Executors.newSingleThreadScheduledExecutor().schedule(() -> {
                 Guild guild = DiscordIntegration.INSTANCE.getJDA().getGuildById(OverseerConfig.GUILD_ID);
                 if (guild != null) {
-                    guild.upsertCommand("friendfriday", "Generate a Friend Friday invite link").queue(
-                            s -> DiscordIntegration.LOGGER.info("[The Overseer] Registering Slash Command /friendfriday"),
-                            e -> DiscordIntegration.LOGGER.error("[The Overseer] Failed to register Slash Command /friendfriday", e)
-                    );
+                    guild.upsertCommand("friendfriday", "Generate a Friend Friday invite link")
+                            .addOption(OptionType.STRING, "invite", "Discord Invite with application bypass", true)
+                            .queue(
+                                    s -> DiscordIntegration.LOGGER.info("[The Overseer] Registering Slash Command /friendfriday"),
+                                    e -> DiscordIntegration.LOGGER.error("[The Overseer] Failed to register Slash Command /friendfriday", e)
+                            );
+
+                    guild.upsertCommand("ff-test", "test end friend friday")
+                            .queue(
+                                    s -> DiscordIntegration.LOGGER.info("[The Overseer] Registering Slash Command /ff-test"),
+                                    e -> DiscordIntegration.LOGGER.error("[The Overseer] Failed to register Slash Command /ff-test", e)
+                            );
                 }
             }, 2, java.util.concurrent.TimeUnit.SECONDS);
 
