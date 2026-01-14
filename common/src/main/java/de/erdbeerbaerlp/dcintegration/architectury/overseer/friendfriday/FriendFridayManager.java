@@ -2,6 +2,7 @@ package de.erdbeerbaerlp.dcintegration.architectury.overseer.friendfriday;
 
 import de.erdbeerbaerlp.dcintegration.architectury.overseer.OverseerConfig;
 import de.erdbeerbaerlp.dcintegration.common.DiscordIntegration;
+import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
@@ -15,7 +16,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class FriendFridayManager {
-    private static boolean isActive = false;
     private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     public static void init() {
@@ -24,7 +24,7 @@ public class FriendFridayManager {
     }
 
     public static boolean isActive() {
-        return isActive;
+        return FriendFridayData.isActive();
     }
 
     private static void checkTime() {
@@ -75,35 +75,53 @@ public class FriendFridayManager {
 
     //stop friend friday
     public static void endEvent() {
-
-        // delete invite from the server so that no one else can join from it
-
-        isActive = false;
         DiscordIntegration.LOGGER.info("Friend Friday is over!");
-
+        String inviteLink = FriendFridayData.currentInvite;
         FriendFridayData.clear();
 
-        if (!OverseerConfig.FF_ANNOUNCE_CHANNEL_ID.equals("000000000000000000")) {
-            var channel = DiscordIntegration.INSTANCE.getJDA().getTextChannelById(OverseerConfig.FF_ANNOUNCE_CHANNEL_ID);
-            if (channel != null) {
-                var guild = channel.getGuild();
-                var role = guild.getRoleById(OverseerConfig.FF_ROLE_ID);
+        if (OverseerConfig.GUILD_ID.equals("000000000000000000")) {
+            DiscordIntegration.LOGGER.warn("GUILD_ID is not set, cant cleanup Friend Friday.");
+            return;
+        }
 
-                if (role != null) {
-                    guild.findMembersWithRoles(role).onSuccess(members -> {
-                        for (Member member : members) {
-                            member.getUser().openPrivateChannel().queue(dm -> {
-                                dm.sendMessage(OverseerConfig.FF_KICK_DM).queue(
-                                        s -> guild.kick(member).reason("Friend Friday is over!").queue(),
-                                        e ->guild.kick(member).reason("Friend Friday is over!").queue()
-                                );
-                            }, error -> {
-                                guild.kick(member).reason("Friend Friday is over!").queue();
-                            });
-                        }
+        var guild = DiscordIntegration.INSTANCE.getJDA().getGuildById(OverseerConfig.GUILD_ID);
+        if (guild == null) {
+            DiscordIntegration.LOGGER.warn("Guild not found, cant cleanup Friend Friday");
+            return;
+        }
+
+        if (inviteLink != null && !inviteLink.isEmpty()) {
+            String code = inviteLink.substring(inviteLink.lastIndexOf('/') + 1);
+
+            guild.retrieveInvites().queue(invites -> {
+                for (Invite invite : invites) {
+                    if (invite.getCode().equals(code)) {
+                        invite.delete().reason("Friend Friday is over!").queue();
+                        break;
+                    }
+                }
+            });
+        }
+
+        if (OverseerConfig.FF_ROLE_ID.equals("000000000000000000")) {
+            DiscordIntegration.LOGGER.warn("FF_ROLE_ID is not set, cant cleanup Friend Friday.");
+            return;
+        }
+
+        var role = guild.getRoleById(OverseerConfig.FF_ROLE_ID);
+        if (role != null) {
+            guild.findMembersWithRoles(role).onSuccess(members -> {
+                for (Member member : members) {
+                    member.getUser().openPrivateChannel().queue(dm -> {
+                        dm.sendMessage(OverseerConfig.FF_KICK_DM).queue(
+                                s -> guild.kick(member).reason("Friend Friday is over!").queue(),
+                                e ->guild.kick(member).reason("Friend Friday is over!").queue()
+                        );
+                    }, error -> {
+                        guild.kick(member).reason("Friend Friday is over!").queue();
                     });
                 }
-            }
+            });
         }
     }
 }
