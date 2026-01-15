@@ -2,7 +2,6 @@ package de.erdbeerbaerlp.dcintegration.architectury.overseer.friendfriday;
 
 import de.erdbeerbaerlp.dcintegration.architectury.overseer.OverseerConfig;
 import de.erdbeerbaerlp.dcintegration.common.DiscordIntegration;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -50,9 +49,9 @@ public class FriendFridayListener extends ListenerAdapter {
                 return;
             }
 
-            event.reply("done").setEphemeral(true).queue();
-            FriendFridayManager.endEvent();
-
+            FriendFridayData.endTime = System.currentTimeMillis() + 15000;
+            FriendFridayData.save();
+            event.reply("⏱️ Debug: Set Friend Friday to expire in 15 seconds").setEphemeral(true).queue();
         }
     }
 

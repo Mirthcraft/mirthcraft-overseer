@@ -30,7 +30,7 @@ public class FriendFridayManager {
     private static void checkTime() {
         if (!OverseerConfig.FF_ENABLED) return;
 
-        if (FriendFridayData.isActive() && System.currentTimeMillis() > FriendFridayData.endTime) {
+        if (FriendFridayData.endTime != -1 && System.currentTimeMillis() > FriendFridayData.endTime) {
             endEvent();
         }
     }
@@ -77,7 +77,6 @@ public class FriendFridayManager {
     public static void endEvent() {
         DiscordIntegration.LOGGER.info("Friend Friday is over!");
         String inviteLink = FriendFridayData.currentInvite;
-        FriendFridayData.clear();
 
         if (OverseerConfig.GUILD_ID.equals("000000000000000000")) {
             DiscordIntegration.LOGGER.warn("GUILD_ID is not set, cant cleanup Friend Friday.");
@@ -112,6 +111,16 @@ public class FriendFridayManager {
         if (role != null) {
             guild.findMembersWithRoles(role).onSuccess(members -> {
                 for (Member member : members) {
+
+                    boolean isActiveMirther = member.getRoles().stream()
+                            .anyMatch(r -> r.getId().equals(OverseerConfig.ACTIVE_MIRTHER_ROLE_ID));
+
+                    if (isActiveMirther) {
+                        DiscordIntegration.LOGGER.info("Skipping kick for Active Mirther: {}", member.getUser().getName());
+                        guild.removeRoleFromMember(member, role).reason("you shouldn't have this role").queue();
+                        continue;
+                    }
+
                     member.getUser().openPrivateChannel().queue(dm -> {
                         dm.sendMessage(OverseerConfig.FF_KICK_DM).queue(
                                 s -> guild.kick(member).reason("Friend Friday is over!").queue(),
@@ -123,5 +132,7 @@ public class FriendFridayManager {
                 }
             });
         }
+
+        FriendFridayData.clear();
     }
 }
