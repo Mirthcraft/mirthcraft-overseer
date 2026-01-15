@@ -8,6 +8,8 @@ This is a custom coded discord bot/minecraft mod for the Mirthcraft server. This
 
 - **Whitelist:** Set a channel for people to put their IGNs in and it will auto whitelist that user. In addition it will link that person's discord and minecraft username to automatically remove or add them to the whitelist if they leave or rejoin the discord.
 
+
+- **Friend Friday:** Admins can run /friendfriday `invite link` in order to announce and start Friend Friday (invite needed due to built in discord applications). Once the set time is over those with the Friend Friday role will be kicked from the discord with a custom message.
 ---
 
 > ## License
